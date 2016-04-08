@@ -1,0 +1,9 @@
+= Greach 2016 - Geb for Browser Automation
+
+Slides for conference presentation including a sample Ratpack application
+
+== Compile the slides
+ 
+Compile the slides using `gradle asciidoctor`
+
+Or 
