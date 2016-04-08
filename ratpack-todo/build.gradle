@@ -1,26 +1,162 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 buildscript {
-  repositories {
-    jcenter()
-  }
-  dependencies {
-    classpath "io.ratpack:ratpack-gradle:1.2.0"
-    classpath "com.github.jengelman.gradle.plugins:shadow:1.2.2"
-  }
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath "io.ratpack:ratpack-gradle:1.2.0"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.6.4"
+        classpath "com.bertramlabs.plugins:less-asset-pipeline:2.6.4"
+        classpath 'org.gebish:geb-gradle:0.12.2'
+    }
 }
 
 apply plugin: "io.ratpack.ratpack-groovy"
-apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: "idea"
 apply plugin: "eclipse"
+apply plugin: "asset-pipeline"
+
+apply plugin: "geb-saucelabs"
+
+assets {
+    skipNonDigests = true
+}
+ext {
+    drivers = ["firefox", "chrome", "phantomJs"]
+
+    ext {
+        groovyVersion = '2.4.1'
+        gebVersion = '0.13.1'
+        seleniumVersion = '2.53.0'
+        chromeDriverVersion = '2.20'
+        phantomJsVersion = '1.9.7'
+    }
+}
+apply from: "gradle/osSpecificDownloads.gradle"
 
 repositories {
-  jcenter()
+    mavenLocal()
+    jcenter()
+    maven { url "https://repo.grails.org/grails/core" }
+    maven { url "http://repository-saucelabs.forge.cloudbees.com/release" }
 }
 
 dependencies {
-  // Default SLF4J binding.  Note that this is a blocking implementation.
-  // See here for a non blocking appender http://logging.apache.org/log4j/2.x/manual/async.html
-  runtime 'org.slf4j:slf4j-simple:1.7.12'
+    compile ratpack.dependency("guice")
+    compile ratpack.dependency("remote")
+    testCompile ratpack.dependency("remote-test")
 
-  testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
+    testCompile( 'com.athaydes:spock-reports:1.2.10' ) {
+        transitive = false // this avoids affecting your version of Groovy/Spock
+    }
+
+    // Default SLF4J binding.  Note that this is a blocking implementation.
+    // See here for a non blocking appender http://logging.apache.org/log4j/2.x/manual/async.html
+    runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.2'
+    runtime 'org.apache.logging.log4j:log4j-api:2.2'
+    runtime 'org.apache.logging.log4j:log4j-core:2.2'
+    runtime 'com.lmax:disruptor:3.3.0'
+
+    def gebVersion = "0.13.1"
+    def seleniumVersion = "2.53.0"
+
+    // If using Spock, need to depend on geb-spock
+    testCompile "org.gebish:geb-spock:$gebVersion"
+    testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
+
+    // Need a driver implementation
+    testCompile "org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion"
+    testCompile "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion"
+    // using a custom version of phantomjs driver for now as the original one does not support WebDriver > 2.43.1
+    testCompile("com.codeborne:phantomjsdriver:1.2.1") {
+        transitive = false // phantomjs driver pulls in a different selenium version
+    }
+
+    testRuntime "org.seleniumhq.selenium:selenium-support:$seleniumVersion"
+
+    compile('org.grails:grails-datastore-gorm-hibernate4:4.0.7.RELEASE') {
+        exclude module: 'groovy'
+    }
+    compile('org.grails:grails-spring:3.0.9') {
+        exclude module: 'groovy'
+    }
+    compile 'com.h2database:h2:1.4.190'
+
+    sauceConnect "com.saucelabs:ci-sauce:1.81"
+
+}
+
+/*
+drivers.each { driver ->
+    task "${driver}Test"(type: Test) {
+        reports {
+            html.destination = reporting.file("$name/tests")
+            junitXml.destination = file("$buildDir/test-results/$name")
+        }
+
+        outputs.upToDateWhen { false }  // Always run tests
+
+        systemProperty "geb.build.reportsDir", reporting.file("$name/geb")
+        systemProperty "geb.env", driver
+
+        // If you wanted to set the baseUrl in your build…
+        // systemProperty "geb.build.baseUrl", "http://myapp.com"
+    }
+}
+
+chromeTest {
+    dependsOn unzipChromeDriver
+
+    def chromedriverFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "chromedriver.exe" : "chromedriver"
+    systemProperty "webdriver.chrome.driver", new File(unzipChromeDriver.outputs.files.singleFile, chromedriverFilename).absolutePath
+    systemProperty "com.athaydes.spockframework.report.outputDir", reporting.file("$name/chrome-spockreports")
+}
+
+phantomJsTest {
+    dependsOn unzipPhantomJs
+
+    def phantomJsFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "phantomjs.exe" : "bin/phantomjs"
+    systemProperty "phantomjs.binary.path", new File(unzipPhantomJs.outputs.files.singleFile, phantomJsFilename).absolutePath
+    systemProperty "com.athaydes.spockframework.report.outputDir", reporting.file("$name/phantomjs-spockreports")
+}
+
+test {
+	testLogging {
+		showStandardStreams = true
+	}
+    dependsOn drivers.collect { tasks["${it}Test"] }
+    enabled = false
+}
+*/
+
+
+sauceLabs {
+    browsers {
+        firefox_linux_19
+        chrome_mac
+        delegate."internet explorer_vista_9"
+        nexus4 {
+            capabilities(
+                    browserName: "android",
+                    platform: "Linux",
+                    version: "4.4",
+                    deviceName: "LG Nexus 4"
+            )
+        }
+    }
+    task {
+        testClassesDir = test.testClassesDir
+        testSrcDirs = test.testSrcDirs
+        classpath = test.classpath
+    }
+    account {
+        username = "Username"
+        accessKey = "api-key"
+    }
+    connect {
+//        port = 4444
+//        additionalOptions = ['--proxy', 'proxy.example.com:8080']
+    }
 }

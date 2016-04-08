@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Todo List</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="css/bootstrap.css"/>
+	<link rel="stylesheet" href="css/bootstrap-theme.css"/>
+	<link rel="stylesheet" href="css/application.css"/>
+
+	<script type="text/javascript" src="js/jquery-2.2.2.js"></script>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
+	<script type="text/javascript" src="js/application.js"></script>
+</head>
+<body class="container">
+
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+		</div>
+
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="/">Todo List<span class="sr-only">(current)</span></a></li>
+				<li><a href="/about">About</a></li>
+			</ul>
+		</div><!-- /.navbar-collapse -->
+	</div><!-- /.container-fluid -->
+</nav>
+
+
+<h1>Todo List</h1>
+
+<div class="row">
+	<div class="col-sm-12">
+		<form class="form-inline well">
+		  <div class="form-group rounded">
+		    <label for="new-todo">Remember to do this!</label>
+        <input type="text" class="form-control" id="new-todo" placeholder="Do nerdy stuff">
+      </div>
+      <button type="submit" id="create-btn" class="btn btn-primary">Create</button>
+		</form>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<ul id="todo-stats">
+			<h3>Currently: <span id="count"></span> todo items</h3>
+		</ul>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<ul id="todo-list">
+
+		</ul>
+	</div>
+</div>
+
+
+	<script>
+		function updateCount() {
+			var count = jQuery('li.todo-item').length;
+			console.debug(count);
+			jQuery("#count").html("" + count);
+		}
+		function formatItem(data) {
+			var checked = data.completed ? 'checked' : '';
+			var item = "<li class='todo-item' style='display: none'>";
+			item += "<input type='checkbox' "+ checked +" class='toggle-checkbox' data-id='"+data.id+"'/>";
+			item += "<label for='item-"+data.id+"' class='checkbox-label'>"+ data.text +"</label>";
+			item += "<button type='button' class='btn btn-default btn-xs delete-btn' data-id='"+data.id+"'>";
+			item += "<span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>";
+			item +=	"</li>";
+			return item;
+		}
+
+		jQuery(document).ready( function() {
+			var items = jQuery.get( '/items');
+			items.done( function(data) {
+				jQuery.each( data, function(k,v){
+					var item = formatItem(v);
+					jQuery('#todo-list').append(item);
+				});
+				jQuery('li').slideDown();
+				updateCount();
+			});
+
+
+		});
+		jQuery("form").on( 'submit', function(event) {
+      event.preventDefault();
+
+      var form = jQuery( this ),
+      itemText = form.find( "#new-todo" ).val();
+
+			var posting = jQuery.post( '/items', { text: itemText } );
+
+		  posting.done(function( data ) {
+			  console.debug(data);
+			  var item = jQuery(formatItem(data));
+			  jQuery('#todo-list').append(item);
+			  item.slideDown();
+			  jQuery( "#new-todo" ).val("");
+			  updateCount();
+		  });
+			return false;
+		});
+
+		jQuery(document).on('change','.toggle-checkbox', function(event) {
+			var completed = jQuery(this).is(':checked');
+			var id = jQuery(this).attr('data-id');
+			var posting = jQuery.ajax({
+				url: '/items',
+				data: { id: id, completed: completed },
+				method: 'PATCH'
+			});
+
+			posting.done(function( data ) {
+//TODO Message?
+			});
+		});
+
+		jQuery(document).on('click','.delete-btn', function(event) {
+			if( confirm("Sure?") ) {
+				var id = jQuery(this).attr('data-id');
+				var li = jQuery(this).closest('li');
+				var posting = jQuery.ajax({
+					url: '/items/' + id,
+					method: 'DELETE'
+				});
+
+				posting.done(function( data ) {
+					li.slideUp(function() {
+						li.remove();
+						updateCount();
+					})
+				});
+			}
+		});
+
+
+	</script>
+
+</body>
+</html>

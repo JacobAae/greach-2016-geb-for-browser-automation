@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="10">
+<Appenders>
+    <Console name="STDOUT" target="SYSTEM_OUT">
+        <PatternLayout>
+            <!-- %p => Level, i.e Warm, Debug etc. -->
+            <!-- %d{dd MMM yyyy HH:mm:ss,SSS} => date in specified format - 02 Nov 2012 14:34:02,781 -->
+            <!-- %c{2.} => Class name in format 	o.a.commons.Foo -->
+            <!-- [%t] => Thread that generated log statement -->
+            <!-- %m => The message logged -->
+            <!-- %ex => Outputs the Throwable trace bound to the LoggingEvent, -->
+            <!-- %n => Newline -->
+            <Pattern>%p %d{ISO8601} %c{1.} %t %m %ex%n</Pattern>
+        </PatternLayout>
+    </Console>
+</Appenders>
+<Loggers>
+    <AsyncLogger name="ratpack.server.RatpackServer" level="INFO" />
+    <AsyncRoot level="INFO">
+        <AppenderRef ref="STDOUT"/>
+    </AsyncRoot>
+</Loggers>
+</Configuration>

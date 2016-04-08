@@ -1,0 +1,18 @@
+= Ratpack Sample Project
+
+== Description
+
+This is sample application used to demo Geb Testing, and not as a reference for how to use Ratpack.
+
+The application is however a working example o how to use Gorm in Ratpack, if that is what you need,
+based in large parts by the book "Learning Ratpack" by Dan Woods.
+
+== Starting the application
+
+You can start the basic app with
+
+ ./gradlew run
+
+== Testing the application
+
+ ./gradlew check

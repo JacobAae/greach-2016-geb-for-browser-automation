@@ -1,0 +1,11 @@
+ul {
+	list-style: none;
+}
+
+input[type='checkbox'] {
+	margin-right: 10px;
+}
+
+.checkbox-label {
+	min-width: 200px;
+}
