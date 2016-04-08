@@ -1,0 +1,140 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+
+	dependencies {
+		classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.2'
+		classpath 'com.github.jruby-gradle:jruby-gradle-plugin:0.1.5'
+		classpath 'org.ysb33r.gradle:vfs-gradle-plugin:1.0-beta1'
+		classpath 'commons-httpclient:commons-httpclient:3.1'
+		classpath 'com.bluepapa32:gradle-watch-plugin:0.1.4' // watch files and perform action
+	}
+}
+
+apply plugin: 'com.github.jruby-gradle.base'
+apply plugin: 'org.ysb33r.vfs'
+apply plugin: 'java'
+apply plugin: 'org.asciidoctor.convert'
+apply plugin: 'idea'
+apply plugin: 'com.bluepapa32.watch'
+
+ext {
+    revealjsVersion = '3.2.0'
+    asciidoctorBackendVersion = 'master'
+	downloadDir = new File(buildDir, 'download')
+	templateDir = new File(downloadDir, 'templates')
+	revealjsDir = new File(downloadDir, 'reveal.js')
+}
+
+repositories {
+	jcenter()
+}
+
+dependencies {
+	gems 'rubygems:asciidoctor-diagram:1.3.0.preview.3'
+	gems 'rubygems:slim:2.1.0'
+	gems 'rubygems:thread_safe:0.3.4'
+}
+
+task download << {
+	mkdir downloadDir
+	vfs {
+        cp "zip:https://github.com/asciidoctor/asciidoctor-reveal.js/archive/${asciidoctorBackendVersion}.zip!asciidoctor-reveal.js-${asciidoctorBackendVersion}",
+                templateDir, recursive: true, overwrite: true
+        cp "zip:https://github.com/hakimel/reveal.js/archive/${revealjsVersion}.zip!reveal.js-${revealjsVersion}",
+                revealjsDir, recursive: true, overwrite: true
+	}
+}
+
+download {
+	description "Download extra revealjs resources"
+	outputs.dir templateDir
+	outputs.dir revealjsDir
+}
+
+asciidoctor {
+
+	dependsOn jrubyPrepareGems
+	gemPath = jrubyPrepareGems.outputDir
+	requires = ['asciidoctor-diagram']
+
+	sources {
+		include 'index.adoc'
+	}
+
+	resources {
+		from(sourceDir) {
+			include 'images/**'
+		}
+		from(downloadDir) {
+			include 'reveal.js/**'
+		}
+	}
+
+	backends 'revealjs'
+
+	attributes 'sourcedir': project.sourceSets.main.java.srcDirs[0],
+			'source-highlighter': 'coderay',
+			'imagesdir': './images',
+			'toc': 'left',
+			'icons': 'font',
+			'setanchors': 'true',
+			'idprefix': '',
+			'idseparator': '-',
+			'docinfo1': 'true',
+			'revealjs_width': 960,
+			'revealjs_height': 700,
+			'revealjs_transition': 'convex', // none, linear, fade, slide, convex, concave, zoom
+			'revealjs_transitionspeed': 'default', // default, fast, slow
+			'revealjs_margin': 0.1,
+			'revealjs_history': 'true',
+			'revealjs_slideNumber': "'c/t'",
+            'revealjs_theme': 'white',
+            'revealjs_parallaxBackgroundImage': 'images/bg.png'
+
+	options template_dirs: [new File(templateDir, 'templates/slim').absolutePath]
+
+	dependsOn download
+
+    doLast {
+        def mappings = [
+                stack      : ['', '', ''],
+        ]
+        def videos = [
+                'rep-unit' : 'unit-testing.mp4',
+                'rep-testing' : 'why-testing.mp4',
+                'rep-crazy-coding' : 'crazy-coding.mp4',
+
+        ]
+        def html = new File("$buildDir/asciidoc/revealjs/index.html")
+        def fixed = html.text
+        fixed = fixed.replaceAll("""<section id="rep-geb"><h2>(.+?)</h2>""", """<section id="rep-geb"><img alt="geb" src="./images/geb.png" style="border:none;"> """)
+
+        videos.each { id, video ->
+            fixed = fixed.replaceAll("""<section id="$id"><h2>(.+?)</h2>""", """<section id="$id">
+<video controls autoplay loop style="width: 100%;"">
+  <source src="images/${video}" type="video/mp4">
+  Your browser does not support the video tag.
+</video>""")
+        }
+        mappings.each { id, replacements ->
+            def (bgColor, textColor, title) = replacements
+            fixed = fixed.replaceAll("""<section id="$id"><h2>(.+?)</h2>""", """<section id="$id" data-background='${
+                bgColor
+            }'><h2 style='color: ${textColor}'>$title</h2>""")
+        }
+        html.withWriter('utf-8') {
+            it.write fixed
+        }
+    }
+}
+
+watch {
+	asciidoc {
+		files fileTree(dir: 'src')
+		tasks 'asciidoctor'
+	}
+}
+
+defaultTasks 'asciidoctor'
