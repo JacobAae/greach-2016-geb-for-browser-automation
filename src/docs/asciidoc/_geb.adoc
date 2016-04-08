@@ -1,0 +1,54 @@
+=== Geb history
+
+* Started in November 2009
+* Created by Luke Daley
+* Current project lead Marcin Erdman
+
+
+=== Geb Implementation
+
+* Build on top of the WebDriver browser automation library
+** successor to the Selenium Remote Control (RC) testing framework.
+
+** Selenium RC -> JavaScript to interact
+** WebDriver -> native browser drivers
+* Use JUnit or Spock
+
+[NOTE.speaker]
+WebDriver -> Known as "Selenium 2" +
+Sponsored by Google +
+Becomming W3C standard +
+https://w3c.github.io/webdriver/webdriver-spec.html
+
+
+=== WebDriver
+
+* Very active development
+* Stable API and feature set
+* Verbose
+* Low level
+* Not a complete solution
+
+[NOTE.speaker]
+Geb aims to embrace the pros and solve the cons by building on top. +
+Only real player in browser automation
+
+
+
+=== Why Geb
+
+* jQuery like selector syntax
+* Power of WebDriver (Easier api)
+* Robustness of Page Object modeling
+* Expressiveness of the Groovy language
+* Integrates well with build systems (Gradle/Maven)
+* Excellent user manual/documentation
+
+
+
+=== Stack
+
+image::stack.png[]
+
+[NOTE.speaker]
+Application under test

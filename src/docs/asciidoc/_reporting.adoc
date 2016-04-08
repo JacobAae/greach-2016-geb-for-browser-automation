@@ -1,0 +1,64 @@
+=== Test reports
+
+* Nicely formatted
+* Spock power-assert format
+
+
+=== Spock Reports
+
+Take a look at https://github.com/renatoathaydes/spock-reports/blob/master/news.md[Spock Reports] plugin
+
+[source,groovy,indent=0]
+----
+testCompile( 'com.athaydes:spock-reports:1.2.10' ) {
+    // this avoids affecting your version of Groovy/Spock
+    transitive = false
+}
+----
+
+
+=== Spock Reports
+
+image::spock-report.png[,70%]
+
+=== Spock Reports
+
+image::spock-report-error.png[,70%]
+
+
+
+
+=== Screenshots
+
+Screenshots and HTML from end of each test:
+
+Extend from `GebReportingSpec`
+
+[source,groovy,indent=0]
+----
+class AttendeeFunctionalSpec extends GebReportingSpec
+----
+
+[source,groovy,indent=0]
+.GebConfig.groovy
+----
+reportsDir = new File("build/geb-reports")
+reportOnTestFailureOnly = true
+----
+
+[NOTE.speaker]
+DEMO: Class
+
+
+
+=== Ad-hoc Screenshots
+
+[source,groovy,indent=0]
+----
+report "When-form-is-just-filled"
+----
+
+* Saves a report in reportsDir
+* Numbered in increasing order
+
+

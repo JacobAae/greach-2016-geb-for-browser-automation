@@ -1,0 +1,223 @@
+
+=== GebConfig
+
+Configuration for Geb is placed in `GebConfig.groovy`
+
+It must be placed in default package scope
+
+TIP: http://www.gebish.org/manual/current/configuration.html
+
+[NOTE.speaker]
+No package!
+
+
+=== Driver
+
+It is possible to configure the browser used.
+
+=== Supported Drivers
+
+* Firefox
+* Chrome
+* InternetExplorer
+* Safari
+
+* HtmlUnit
+* PhantomJS
+
+[NOTE.speaker]
+Headless browsers run faster +
+Not so reliable
+
+
+=== Driver
+
+It is possible to configure the browser used.
+
+
+
+[source,groovy,indent=0]
+.build.gradle
+----
+compile 'org.seleniumhq.selenium:selenium-chrome-driver:2.49.0'
+compile 'org.seleniumhq.selenium:selenium-firefox-driver:2.49.0'
+----
+
+
+=== Firefox
+
+[source,groovy,indent=0]
+.GebConfig.groovy
+----
+import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.firefox.FirefoxDriver
+
+driver = {
+    FirefoxProfile profile = new FirefoxProfile()
+    profile.setPreference("browser.download.folderList", 2)
+    profile.setPreference("browser.download.dir", "/tmp")
+    profile.setPreference(
+         "browser.helperApps.neverAsk.saveToDisk", "text/csv")
+
+    def driverInstance = new FirefoxDriver(profile)
+    driverInstance.manage().window().maximize()
+    driverInstance
+}
+----
+
+[NOTE.speaker]
+Download - dont ask +
+Maximize window
+
+=== Chrome
+
+* Needs ChromeDriver downloaded
+* Pretty fast and stable
+
+
+=== Chrome (1)
+
+[source,groovy,indent=0]
+.GebConfig.groovy
+----
+private String driverLocationDependingOnOperatingSystem() {
+    String os = System.getProperty("os.name").toLowerCase();
+    def loc = "http://chromedriver.storage.googleapis.com/2.20"
+    if( os.contains('mac')) {
+        return "${loc}/chromedriver_mac32.zip"
+    }
+    if( os.contains('win')) {
+        return "${loc}/chromedriver_win32.zip"
+    }
+    return "${loc}/chromedriver_linux64.zip"
+}
+
+----
+
+
+[NOTE.speaker]
+This can also be handled from Gradle - and support multiple browsers
+
+=== Chrome (2)
+
+[source,groovy,indent=0]
+.GebConfig.groovy
+----
+private void downloadDriver(File file, String path) {
+    if (!file.exists()) {
+        def ant = new AntBuilder()
+        ant.get(src: path, dest: 'driver.zip')
+        ant.unzip(src: 'driver.zip', dest: file.parent)
+        ant.delete(file: 'driver.zip')
+        ant.chmod(file: file, perm: '700')
+    }
+}
+----
+
+
+=== Chrome (3)
+
+[source,groovy,indent=0]
+.GebConfig.groovy
+----
+def chromeDriver = new File('build/drivers/chrome/chromedriver')
+downloadDriver(chromeDriver,
+        driverLocationDependingOnOperatingSystem())
+System.setProperty('webdriver.chrome.driver',
+        chromeDriver.absolutePath)
+
+driver = {
+    def driverInstance = new ChromeDriver()
+
+    def browserWindow = driverInstance.manage().window()
+    // width, height
+    browserWindow.size = new Dimension(1000, 2500)
+    browserWindow.position = new Point(0, 0)
+
+    driverInstance
+}
+----
+
+=== Cloud Based Testing
+
+* SauceLabs
+* BrowserStack
+
+
+=== SauceLabs
+
+[source,groovy,indent=0]
+.GebConfig.groovy
+----
+import geb.driver.SauceLabsDriverFactory
+
+def slBrowser = System.getProperty("geb.saucelabs.browser")
+if (slBrowser) {
+    driver = {
+        def username = System.getenv(
+            "GEB_SAUCE_LABS_USER")
+        assert username
+        def accessKey = System.getenv(
+            "GEB_SAUCE_LABS_ACCESS_PASSWORD")
+        assert accessKey
+        new SauceLabsDriverFactory().create(
+                sauceLabsBrowser, username, accessKey)
+    }
+}
+----
+
+
+=== SauceLabs
+
+[source,groovy,indent=0]
+.build.gradle
+----
+apply plugin: "geb-saucelabs"
+
+repositories {
+  ...
+  mavenCentral()
+}
+
+dependencies {
+  ...
+  sauceConnect "com.saucelabs:ci-sauce:1.113"
+}
+----
+
+
+=== SauceLabs
+
+[source,groovy,indent=0]
+----
+sauceLabs {
+    browsers {
+        firefox_linux_19
+        delegate."internet explorer_vista_9"
+        nexus4 {
+            capabilities(
+                    browserName: "android", platform: "Linux",
+                    version: "4.4", deviceName: "LG Nexus 4"
+            )
+ }   }
+    task {
+        testClassesDir = test.testClassesDir
+        testSrcDirs = test.testSrcDirs
+        classpath = test.classpath
+    }
+    account {
+        username = "username"
+        accessKey = "api-key"
+    }
+    connect {
+//        port = 4444
+//        additionalOptions = ['--proxy', 'proxy.example.com:8080']
+    } }
+----
+
+[NOTE.speaker]
+====
+build.gradle
+
+Default port 4445
+====

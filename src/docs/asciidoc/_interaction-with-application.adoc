@@ -1,0 +1,219 @@
+=== Geb With Ratpack
+
+
+[source,groovy,indent=0]
+----
+dependencies {
+  ...
+  // If using Spock, need to depend on geb-spock
+  testCompile "org.gebish:geb-spock:0.13.1"
+  testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
+
+  // Need a driver implementation
+  testCompile(
+   "org.seleniumhq.selenium:selenium-firefox-driver:2.53.0"
+  )
+  testRuntime(
+   "org.seleniumhq.selenium:selenium-support:2.53.0"
+  )
+}
+----
+
+[NOTE.speaker]
+Selenium support:  Required fx to set values in select
+
+
+=== Geb With Ratpack
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/AboutFunctionalSpec.groovy[tags=ratpack-geb]
+----
+
+=== Interacting with Ratpack Application
+
+When some functionality is needed that is not exposed through the browser,
+it can be necessary to interact with the application under test.
+
+
+=== Interacting with Ratpack
+
+Include in build.gradle
+[source,groovy,indent=0]
+----
+dependencies {
+    ...
+    compile ratpack.dependency("remote")
+    testCompile ratpack.dependency("remote-test")
+    ...
+----
+
+
+=== Interacting with Ratpack
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/TodoListFunctionalSpec.groovy[tags=remote1]
+----
+
+
+=== Interacting with Ratpack
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/TodoListFunctionalSpec.groovy[tags=remote2]
+----
+
+[NOTE.speaker]
+Here we wish to check the completed click has propagated to the database. Could also refresh page
+
+
+
+
+
+=== Geb and Grails 2.x
+
+Must install plugin in `BuildConfig.groovy`
+
+[source,groovy,indent=0]
+----
+dependencies {
+  ...
+  test("org.seleniumhq.selenium:selenium-support:2.53.0")
+  test("org.seleniumhq.selenium:selenium-firefox-driver:2.53.0")
+  test "org.gebish:geb-spock:0.12.1"
+}
+plugins {
+  ...
+  test "org.grails.plugins:geb:0.12.1"
+}
+----
+
+[NOTE.speaker]
+Selenium support:  Required fx to set values in select
+
+
+
+=== Geb Tests in Grails 2.x
+
+Tests placed in `test/functional` folder
+
+
+Running the tests
+
+----
+grails test-app functional:
+----
+
+
+
+
+
+
+=== Geb and Grails 3
+
+Geb is default in `build.gradle`
+
+[source,groovy,indent=0]
+----
+dependencies {
+  ...
+  testCompile "org.grails.plugins:geb"
+
+  testRuntime(
+   "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
+  )
+  testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
+}
+----
+
+
+[NOTE.speaker]
+====
+Run as integration tests
+Note: It is recommended to update to a more robust driver (Chrome, Firefox etc.)
+====
+
+
+===  Geb Tests in Grails 3
+
+Creating Geb Spec
+
+----
+grails create-functional-test MyGebScenario
+----
+
+Placing the test in `src/integration-test/groovy`
+
+
+Running the tests
+
+----
+grails test-app -integration
+----
+
+
+=== Generated Class
+
+[source,groovy,indent=0]
+----
+@Integration
+@Rollback
+class DemoSpec extends GebSpec {
+
+    void "test something"() {
+        when:"The home page is visited"
+            go '/'
+
+        then:"The title is correct"
+        	$('title').text() == "Welcome to Grails"
+    }
+}
+----
+
+
+
+
+
+
+
+=== Interacting with Grails 2.5
+
+Tests not running in same JVM
+
+Done with remote-control plugin
+
+Send a closure for execution in application
+
+
+[source,groovy,indent=0]
+----
+compile ":remote-control:2.0"
+----
+
+
+=== Interacting with Grails 3.0
+
+Application is in same jvm
+
+Interaction is possible directly
+
+Tests run as integration tests
+
+
+
+=== Interacting with Grails 3.0
+
+[source,groovy,indent=0]
+----
+setup:
+Attendee.withNewTransaction {
+   15.times {
+      new Attendee(name: "N$it", email: "m$it@t.dk").save()
+   }
+}
+----
+
+[NOTE.speaker]
+Should cleanup appropriately
+

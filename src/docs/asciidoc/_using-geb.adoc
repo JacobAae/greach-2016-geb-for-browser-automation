@@ -1,0 +1,228 @@
+
+=== Navigator
+
+The `$()` method returns a Navigator object
+
+General format - Jquery like selecter syntax
+
+[source,groovy,indent=0]
+----
+$( <css selector>, <index/range>, <attribute/text matchers> )
+----
+
+=== Geb Selectors (1)
+
+
+
+[source,groovy,indent=0]
+----
+// match all 'p' elements on page
+$("p")
+
+// match the first 'p' element on the page
+$("p", 0)
+
+// All 'div' elements with a title value 'section'
+$("div", title: "section")
+
+// match the first 'div' element text 'section'
+$("div", 0, text: "section")
+
+// match the first 'div' element with the class 'main'
+$("div.main", 0)
+----
+
+
+
+=== Geb Selectors (2)
+
+Text attribute supports regex
+
+[source,groovy,indent=0]
+----
+// Any div with the text starting wih GR8
+$("div", text: ~/GR8.+/)
+$("p", text: startsWith("GR8"))
+
+// And other handy predicates
+$("div", class: contains("ui-"))
+----
+
+
+=== Geb Selectors (3)
+
+
+Selecting returns `Navigator` objects
+
+[source,groovy,indent=0]
+----
+// The parent of the first div
+$("div", 0).parent()
+
+// All tables with a cellspacing
+// attribute value of 0 that are nested in a paragraph
+$("p").find("table", cellspacing: '0')
+----
+
+[NOTE.speaker]
+previous() +
+next() +
+parent() +
+siblings() +
+children()
+
+
+=== CSS Support
+
+[source,groovy,indent=0]
+----
+$("table tr:nth-child(2n+1) td")
+----
+
+[NOTE.speaker]
+Full CSS3 if the target browser supports it.+
+CSS lookup is efficient
+
+
+
+=== Retriving Information
+
+[source,html,indent=0]
+----
+<p id="sample" class="class-a class-b" title="Sample p element">
+Sample text
+</p>
+----
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/AboutFunctionalSpec.groovy[tags=retrieving-info]
+----
+
+
+=== Interaction with content
+
+* `click()`
+* `isDisplayed()`
+* `withConfirm{}`
+* `withAlert{}`
+
+
+[source,groovy,indent=0]
+----
+$("a.btn").click()
+$("div").isDisplayed()
+
+withConfirm {
+    $("button.delete").click()
+}
+----
+
+
+=== Sending input
+
+[source,groovy,indent=0]
+----
+import org.openqa.selenium.Keys
+
+// Shorthand for sendKeys() method of WebDriver.
+$("div") << "abc"
+
+$("input", name: "foo") << Keys.chord(Keys.CONTROL, "c")
+----
+
+
+=== Interaction
+
+Using `Actions` API from WebDriver is possible.
+
+But Geb provides the `interact` closure
+
+
+
+=== Control-clicking
+
+[source,groovy,indent=0]
+----
+import org.openqa.selenium.Keys
+
+interact {
+    keyDown Keys.CTRL
+    click $("a.myLink")
+    keyUp Keys.CTRL
+}
+----
+
+
+
+=== Simulate drag-n-drop
+
+
+[source,groovy,indent=0]
+----
+interact {
+    clickAndHold($('#draggable'))
+    moveByOffset(150, 200)
+    release()
+}
+----
+
+Or easier
+
+[source,groovy,indent=0]
+----
+interact {
+    dragAndDropBy($("#draggable"), 150, 200)
+}
+----
+
+
+[NOTE.speaker]
+the element will be clicked then dragged 150 pixels to the right and 200 pixels downward
+
+
+=== More interaction with forms
+
+[source,html,indent=0]
+----
+<form>
+    <input type="text" name="geb" value="Functional" />
+</form>
+----
+
+The value can be read and written via property notation…
+
+[source,groovy,indent=0]
+----
+$("form").geb == "Functional"
+$("form").geb = "Testing"
+----
+
+
+These are literally shortcuts for…
+
+[source,groovy,indent=0]
+----
+$("form").find("input", name: "geb").value() == "Functional"
+$("form").find("input", name: "geb").value("Testing")
+----
+
+
+=== Variables Available
+
+* `title`
+* `browser`
+* `currentUrl`
+* `currentWindow`
+
+
+
+
+=== More possibilities
+
+* Uploading files
+* Downloading files
+* Interacting with javascript
+** js object (Example later)
+
+

@@ -1,0 +1,18 @@
+=== Geb Standalone example
+
+Lets try to automate:
+
+* Searching for `Greach Conference`
+* Click the first link
+* Hopefully end up on the right homepage
+
+=== Geb Standalone example
+
+[source,groovy,indent=0]
+----
+include::../../test/groovy/standalone.groovy[tags=standalone1]
+----
+
+[NOTE.speaker]
+LIVE DEMO: standalon.groovy +
+Run from

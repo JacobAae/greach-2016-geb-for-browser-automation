@@ -1,0 +1,241 @@
+
+=== Scenario
+
+Lets test a small todo application
+
+*Lets test the following*
+
+. Goto list of todos
+. Create new item
+. Delete item again
+
+
+[NOTE.speaker]
+LIVE: Show application
+
+
+=== Geb Spec Basics
+
+[source,groovy,indent=0]
+----
+import geb.spock.GebSpec
+
+@Stepwise // Ensures the tests are run sequentially
+class TodoSpec extends GebSpec {
+
+    // Spock specs here
+}
+----
+
+[NOTE.speaker]
+====
+Spock, but JUnit is also available
+GebReportingSpec
+====
+
+=== Geb Spec (1)
+
+The naive inmaintainable way!
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/TodoListUglySpec.groovy[tags=ugly-1]
+----
+
+=== Geb Spec (2)
+
+The naive inmaintainable way!
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/TodoListUglySpec.groovy[tags=ugly-2]
+----
+
+=== Geb Spec (3)
+
+The naive inmaintainable way!
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/TodoListUglySpec.groovy[tags=ugly-3]
+----
+
+
+
+
+== Geb Spec - The Better Way
+
+If we make a few scenarios, there will be
+
+* Much duplication
+* Many places to correct if we change the layout / DOM
+
+
+=== REP-crazy-coding
+// Video here
+
+
+=== Solution
+
+TIP: Use _pages_ and _modules_
+
+
+=== Page Objects
+
+
+*Describes a web page*
+
+* Url
+* How to check if we are at the correct place
+* Content we wish to interact with
+** .. and how it is found
+* Helper methods
+
+[NOTE.speaker]
+In a phrase: Domain Modelling +
+trusted principles; encapsulation and reuse.
+
+
+=== Page Objects
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/pages/AboutPage.groovy[]
+----
+
+[NOTE.speaker]
+url +
+at must return true  +
+Fail fast +
+content +
+geb keeps track on current page
+
+=== Content Closure
+
+[source,groovy,indent=0]
+----
+static content = {
+    info(required: false) { $("div.info") }
+    message(wait: false) { $("div.message") }
+}
+----
+
+[NOTE.speaker]
+====
+Optional content
+
+Fails if not htere OW.
+
+Wait for dynamic content
+====
+
+
+
+=== Modules
+
+*Describes repeated content*
+
+* Across pages
+* Repeated content within the same page
+
+[NOTE.speaker]
+====
+Reused content fragments
+
+Encapsulation and reuse
+====
+
+=== Modules Across Pages
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/modules/MenubarModule.groovy[]
+----
+
+[NOTE.speaker]
+====
+Notice it locates its own base from where to extract values
+====
+
+
+=== Modules For Repeated Content
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/modules/TodoItemModule.groovy[]
+----
+
+=== Using Modules
+
+[source,groovy,indent=0]
+----
+static content = {
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/pages/IndexPage.groovy[tags=module-use,indent=2]
+}
+----
+
+
+
+=== Geb Spec - structured
+
+Lets try to restructure the ugly spec from before
+
+
+=== Geb Spec - structured (1)
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/TodoListFunctionalSpec.groovy[tags=structured-1]
+----
+
+=== Geb Spec - structured (2)
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/TodoListFunctionalSpec.groovy[tags=structured-2]
+----
+
+=== Geb Spec - structured (3)
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/TodoListFunctionalSpec.groovy[tags=structured-3]
+----
+
+
+
+=== Standalone Revisited
+
+
+[source,groovy,indent=0]
+----
+include::../../test/groovy/standaloneStructured.groovy[tags=standalone1]
+----
+
+=== Standalone Revisited
+
+
+[source,groovy,indent=0]
+----
+include::../../test/groovy/standaloneStructured.groovy[tags=standalone2]
+----
+
+=== Standalone Revisited
+
+
+[source,groovy,indent=0]
+----
+include::../../test/groovy/standaloneStructured.groovy[tags=standalone3]
+----
+
+=== Standalone Revisited
+
+[source,groovy,indent=0]
+----
+include::../../test/groovy/standaloneStructured.groovy[tags=standalone4]
+----
+
+[NOTE.speaker]
+Also pages for DuckDuckGoResultPage and GR8Conf India
+
+

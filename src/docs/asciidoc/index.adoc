@@ -1,0 +1,119 @@
+= Geb for Browser Automation
+Jacob Aae Mikkelsen
+
+
+[NOTE.speaker]
+Interrupt if questions +
+If I speak Danish-English etc +
+Who uses Geb? +
+Who Knows Spock? +
+Who know JQuery?
+
+
+
+== Agenda
+
+* Functional testing
+* Geb - cudos and history
+* How Geb works
+* Geb and Ratpack, Grails 2 and 3
+* Browser support
+* Tips and Tricks
+
+
+
+=== Jacob Aae Mikkelsen
+
+* Senior Engineer at LEGO
+** Microservice based architechture on JVM
+* Previously 4 years at Gennemtænkt IT
+** Consultant on Groovy and Grails
+* External Associate Professor - University of Southern Denmark
+* image:twitter.png[Twitter, 35,35 ,role="inline-image"] @JacobAae
+* Blogs http://grydeske.net/news[The Grails Diary]
+
+
+== Functional testing
+
+include::_functional-testing.adoc[]
+
+
+== REP-Geb
+// GEB Logo
+
+include::_geb.adoc[]
+
+[NOTE.speaker]
+Not only Browser based
+
+
+
+== Using Geb
+
+////
+How Geb works
+////
+
+include::_using-geb.adoc[]
+
+
+== Standalone Geb Script
+
+include::_standalone.adoc[]
+
+
+
+== Structuring Geb Tests
+
+include::_structuring-geb.adoc[]
+
+
+== Geb with Ratpack and Grails
+
+
+include::_interaction-with-application.adoc[]
+
+
+== Configuration and Browser support
+
+include::_configuration.adoc[]
+
+
+== Javascript
+
+include::_javascript.adoc[]
+
+
+== Waiting and Pausing
+
+include::_waiting_pausing.adoc[]
+
+
+== Reporting
+
+include::_reporting.adoc[]
+
+
+== Other usages
+
+* Screenscraping of a site
+* Solving complex problems like 2048
+
+
+[NOTE.speaker]
+DEMO-TID
+
+
+== Resources
+
+* http://gebish.org[]
+* https://groups.google.com/forum/#!forum/geb-user[]
+* https://github.com/geb[]
+* https://gist.github.com/melix/9619800
+* https://github.com/tomaslin/grails-test-recipes
+* https://fbflex.wordpress.com/2010/08/25/geb-and-grails-tips-tricks-and-gotchas/
+* https://github.com/JacobAae/gr8conf-in-2016-geb-for-grails
+
+
+
+== Questions?

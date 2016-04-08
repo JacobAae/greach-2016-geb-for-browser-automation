@@ -1,0 +1,44 @@
+
+=== REP-testing
+
+// Why testing video
+
+=== Why?
+
+image::testing.png[]
+
+
+=== REP-Unit
+// Video here
+
+[NOTE.speaker]
+Unit testing does not check integrations
+
+=== Functional testing
+
+* Ignores the specifics of the underlying software component under test.
+** Whitebox / Greybox
+* Merely asserts that providing certain input results in certain output.
+* *Web-application:* Programmatically controlling a web browser to simulate the actions of a user on a web page.
+
+
+=== Browser Automation
+
+image::testers-coding.gif[]
+
+
+[NOTE.speaker]
+====
+Let your testers focus on UX and UI not functionality
+
+WARNING: Traditionally been tedious, cumbersome and brittle to do
+
+TIP: Geb helps ease the pain
+
+Any browser based application can be tested
+
+Multiple browsers
+
+Programming language agnostic
+====
+

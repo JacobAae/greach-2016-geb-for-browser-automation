@@ -1,0 +1,68 @@
+=== Waiting
+
+
+[source,groovy,indent=0]
+.GebConfig.groovy
+----
+waiting {
+    timeout = 10
+    retryInterval = 0.5
+}
+
+baseNavigatorWaiting = true
+atCheckWaiting = true
+----
+
+
+=== Using Waiting
+
+[source,html,indent=0]
+----
+<div class="fade-me-in" style="display: none">
+  Hi - are yo waiting for me?
+</div>
+<script>
+  $('div.fade-me-in').delay(3000).slideDown();
+</script>
+----
+
+
+[source,groovy,indent=0]
+----
+static content = {
+    fadeInMessage{ $('div.fade-me-in') }
+}
+----
+
+
+[source,groovy,indent=0]
+----
+then:
+waitFor {
+    fadeInMessage.text() == 'Hi - are yo waiting for me?'
+}
+----
+
+[NOTE.speaker]
+DEMO - Fil: ManyAttendeesSpec
+
+=== Pausing Geb
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/AboutFunctionalSpec.groovy[tags=pause-geb]
+----
+
+=== Pausing Geb
+
+[source,groovy,indent=0]
+----
+include::../../../ratpack-todo/src/test/groovy/net/grydeske/greach/AboutFunctionalSpec.groovy[tags=pause]
+----
+
+=== Pausing Geb
+
+image::pause-geb.png[]
+
+[NOTE.speaker]
+LIVE DEMO: PauseFunctionalSpec???

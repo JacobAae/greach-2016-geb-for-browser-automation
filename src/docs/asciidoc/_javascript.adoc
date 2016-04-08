@@ -1,0 +1,51 @@
+
+In case you need to interact using javascript
+
+=== Executing Javascript
+
+Clicking a button that is hidden will create a `ElementNotVisibleException`
+
+[source,html,indent=0]
+----
+<fieldset class="well" style="display: none">
+    <a href="/list" class="btn">List</a>
+</fieldset>
+----
+
+=== Executing Javascript
+
+
+[source,groovy,indent=0]
+----
+JavascriptExecutor executor = (JavascriptExecutor) driver
+executor.executeScript('jQuery(".well").show();')
+----
+
+=== Wrapping Javascript
+
+[source,groovy,indent=0]
+----
+def js( String script ){
+    (driver as JavascriptExecutor).executeScript( script )
+}
+----
+
+[source,groovy,indent=0]
+----
+js('jQuery(".well").show();')
+----
+
+=== Jquery shorthand
+
+[source,groovy,indent=0]
+----
+$("div#a").jquery.mouseover()
+$("#a").jquery.trigger('mouseover')
+----
+
+[NOTE.speaker]
+Groovy code - not Javascript +
+Dont abuse! +
+developed to make triggering mouse related events easier. +
+Use interact if possible or directly JQuery
+
